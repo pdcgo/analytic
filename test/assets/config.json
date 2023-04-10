@@ -1,0 +1,21 @@
+{
+    "thread_count": 10,
+    "lisensi": {
+        "email": "bambangl@mail.com",
+        "pwd": "test1234"
+    },
+    "database": {
+        "DB_URI": null,
+        "DB_NAME": "kampretcode2"
+    },
+    "suplier_csv": true,
+    "tor_directory": "C:/proxy",
+    "tor_print_ip": false,
+    "tor_proxy": false,
+    "captcha": {
+        "user": "",
+        "pass": ""
+    },
+    "session_storage_source": "mixed_storage",
+    "session_storage_local_location": "/pdc_session/"
+}
