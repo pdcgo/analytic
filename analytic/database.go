@@ -1,12 +1,12 @@
 package analytic
 
 import (
-	"io/fs"
 	"log"
 	"os"
-	"strings"
+	"path/filepath"
 	"time"
 
+	"github.com/pdcgo/common_conf/pdc_common"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -24,12 +24,7 @@ func GetConnection(dsn string) *gorm.DB {
 		},
 	)
 
-	dirs := strings.Split(dsn, "/")
-	dir := strings.Join(dirs[0:len(dirs)-1], "/")
-	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		os.Mkdir(dir, fs.ModeDir)
-	}
-
+	os.MkdirAll(filepath.Dir(dsn), os.ModeDir)
 	db, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{
 		Logger: Logger,
 	})
@@ -63,7 +58,32 @@ func (db Database) CleanUp() error {
 
 func NewAnalyticDB(dsn string) *Database {
 	if dsn == "" {
-		dsn = ".db/analytic.db?_auto_vacuum=1"
+		dsn = ".db/analytic.db"
+		oldpath, _ := filepath.Abs(dsn)
+		volume := filepath.VolumeName(oldpath)
+		newpath := filepath.Join(volume, "/", dsn)
+		dsn = newpath
+
+		log.Println(oldpath)
+		if _, err := os.Stat(oldpath); err == nil {
+			oldfile, _ := os.ReadFile(oldpath)
+			newfile, err := os.Create(newpath)
+			if err != nil {
+				pdc_common.ReportError(err)
+			}
+
+			defer newfile.Close()
+
+			_, err = newfile.Write(oldfile)
+			if err != nil {
+				pdc_common.ReportError(err)
+			}
+
+			err = os.RemoveAll(filepath.Dir(oldpath))
+			if err != nil {
+				pdc_common.ReportError(err)
+			}
+		}
 	}
 
 	return &Database{
