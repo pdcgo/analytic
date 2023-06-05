@@ -1,0 +1,80 @@
+
+1. kode setting, implementasi nyebar ?
+2. gimana kodene bisa diadaptasi fleksible bagi programmer pemula ?
+3. gimana yg disingkronkan bukan cuma order ? bisa aja product, toko, buyer order ?
+4. gimana buat kode sing bisa ngakomodasi itu semua ?
+
+
+
+1. structure data
+2. fungsi add to db
+3. fungsi sync to cloud
+
+
+
+----------------------------------------------------------------------
+
+type BaseSyncItem struct {
+	Hash string `gorm:"hash"`
+	Synced bool
+}
+
+type SyncItem interface {
+	func TableName() string
+	func GetHash() string
+}
+
+
+type SyncClient struct {
+	"""
+	pass add di check oldhash(teko sqlite) newhash sama atau enggak
+
+	hash sama: 
+	BaseSyncItem.Synced = true
+
+	hash sama: 
+	BaseSyncItem.Synced = false
+
+	notfound sqlite:
+	BaseSyncItem.Synced = false
+
+	"""
+	func Add(item SyncItem) error 
+	func Sync() error
+	func Migrate(item interface{}) error
+}
+
+func NewSyncClient() *SyncClient {
+	return &SyncClient{}
+}
+
+
+--------------------------------------------------------------------------------
+
+type OrderMukhtar struct {
+	BaseSyncItem
+	Status string
+}
+
+func (ord *OrderMukhtar) GetHash(){
+	return hash(ord.Status)
+}
+
+
+// inisiasi client
+client := NewSyncClient()
+// generate auto schema terus di up bigquery
+// dapet tablename SyncItem.TableName()
+client.Migrate(OrderMukhtar{})
+
+
+
+orderpertama := OrderMukhtar{
+	Status: "dikirim"
+}
+
+client.Add(&orderpertama)
+
+
+// jika pengen sync
+client.Sync()

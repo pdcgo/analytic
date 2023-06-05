@@ -64,7 +64,6 @@ func NewAnalyticDB(dsn string) *Database {
 		newpath := filepath.Join(volume, "/", dsn)
 		dsn = newpath
 
-		log.Println(oldpath)
 		if _, err := os.Stat(oldpath); err == nil {
 			oldfile, _ := os.ReadFile(oldpath)
 			newfile, err := os.Create(newpath)
