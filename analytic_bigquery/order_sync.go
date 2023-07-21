@@ -174,8 +174,11 @@ func (sync BigqueryOrderSync) StoreOrders(ctx context.Context, orders []table.An
 	return nil
 }
 
-func (sync BigqueryOrderSync) Sync(ctx context.Context) error {
-	unsyncOrders, err := sync.Repo.GetUnsyncOrders()
+func (sync BigqueryOrderSync) Sync(ctx context.Context, shopid int64) error {
+	filter := analytic.UnsyncOrderFilter{
+		Shopid: shopid,
+	}
+	unsyncOrders, err := sync.Repo.GetUnsyncOrders(filter)
 	if err != nil {
 		return err
 	} else if len(unsyncOrders) == 0 {

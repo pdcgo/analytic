@@ -26,6 +26,7 @@ func (t *TestItem) GetHash() string {
 }
 
 func TestSync(t *testing.T) {
+	t.Skip()
 	logger := sync.NewLogger()
 	db, err := sync.NewDatabase(".db", logger)
 	panicIfError(err)

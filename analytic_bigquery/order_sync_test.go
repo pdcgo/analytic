@@ -46,6 +46,6 @@ func TestOrderSync(t *testing.T) {
 
 	// store bigquery
 	orderSync := analytic_bigquery.NewBigqueryOrderSync(repo, opts...)
-	err = orderSync.Sync(ctx)
+	err = orderSync.Sync(ctx, 0)
 	assert.Nil(t, err)
 }

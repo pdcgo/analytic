@@ -15,7 +15,6 @@ func getOrders() []analytic.Order {
 	var hasil []analytic.Order
 
 	base, _ := os.Getwd()
-
 	data, _ := os.ReadFile(filepath.Join(base, "../test/assets/analytic.json"))
 
 	json.Unmarshal(data, &hasil)
@@ -23,8 +22,8 @@ func getOrders() []analytic.Order {
 }
 
 func TestShopeeOrderRepo(t *testing.T) {
-	AnalyticDB.CleanUp()
 	repo := analytic.NewShopeeOrderRepo(AnalyticDB)
+	defer AnalyticDB.CleanUp()
 
 	t.Run("test shopee order repo store", func(t *testing.T) {
 		// store orders
@@ -39,7 +38,12 @@ func TestShopeeOrderRepo(t *testing.T) {
 
 	t.Run("test shopee order repo get unsync", func(t *testing.T) {
 		// store orders
-		orders, _ := repo.GetUnsyncOrders()
+		filter := analytic.UnsyncOrderFilter{
+			Shopid: 205931010,
+		}
+		orders, err := repo.GetUnsyncOrders(filter)
+		assert.Nil(t, err)
+
 		for _, order := range orders {
 			log.Printf("Unsync Orderid: %d", order.Id)
 			assert.False(t, order.Sync)

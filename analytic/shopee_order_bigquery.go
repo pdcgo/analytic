@@ -8,8 +8,8 @@ type AnalyticShopeeOrderBigquery struct {
 }
 
 func (analyticBq AnalyticShopeeOrderBigquery) Test() []Order {
-
-	unsyncOrders, _ := analyticBq.Repo.GetUnsyncOrders()
+	filter := UnsyncOrderFilter{}
+	unsyncOrders, _ := analyticBq.Repo.GetUnsyncOrders(filter)
 
 	return unsyncOrders
 }

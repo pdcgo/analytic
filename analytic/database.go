@@ -51,6 +51,11 @@ func (db Database) CleanUp() error {
 		if tx.Error != nil {
 			return tx.Error
 		}
+
+		tx = tx.Exec("VACUUM")
+		if tx.Error != nil {
+			return tx.Error
+		}
 	}
 
 	return nil

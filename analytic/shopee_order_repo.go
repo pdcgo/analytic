@@ -32,15 +32,40 @@ func (repo ShopeeOrderRepo) RemoveDuplicates(orders []Order) []Order {
 	return noDuplicateOrders
 }
 
-func (repo ShopeeOrderRepo) GetUnsyncOrders() ([]Order, error) {
+type UnsyncOrderFilter struct {
+	Shopid int64
+}
+
+func (repo ShopeeOrderRepo) GetUnsyncOrders(f UnsyncOrderFilter) ([]Order, error) {
 	orders := []Order{}
+	filter := map[string]any{
+		"sync": false,
+	}
+
+	if f.Shopid > 0 {
+		filter["shop_id"] = f.Shopid
+	}
+
 	tx := repo.Database.Connection
 	tx = tx.Preload("Buyer").Preload("Shop").Preload("Products")
-	tx = tx.Where(map[string]interface{}{"sync": false})
-	tx = tx.Find(&orders)
+	tx = tx.Where(filter)
 
-	if tx.Error != nil {
-		return orders, tx.Error
+	i := 0
+	row := 10000
+	for {
+		corders := []Order{}
+		otx := tx.Offset(i).Limit(row).Find(&corders)
+		orders = append(orders, corders...)
+
+		if otx.Error != nil {
+			return orders, otx.Error
+		}
+
+		if len(corders) == 0 {
+			break
+		}
+
+		i += row
 	}
 
 	return orders, nil
