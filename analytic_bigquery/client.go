@@ -2,7 +2,6 @@ package analytic_bigquery
 
 import (
 	"cloud.google.com/go/bigquery"
-	"github.com/pdcgo/common_conf/pdc_common"
 	"golang.org/x/net/context"
 	"google.golang.org/api/option"
 )
@@ -26,12 +25,11 @@ func WithClientOptions(opts []option.ClientOption) Option {
 	}
 }
 
-func NewClient(ctx context.Context, opts ...Option) (*bigquery.Client, error) {
-	config := pdc_common.GetConfig()
+func NewClient(credential []byte, ctx context.Context, opts ...Option) (*bigquery.Client, error) {
 	c := &DataClient{
 		ProjectID: "shopeepdc",
 		ClientOpts: []option.ClientOption{
-			config.CredOption(),
+			option.WithCredentialsJSON(credential),
 		},
 	}
 

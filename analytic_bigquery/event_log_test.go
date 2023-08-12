@@ -7,11 +7,13 @@ import (
 
 	"github.com/pdcgo/analytic/analytic_bigquery"
 	table "github.com/pdcgo/analytic/analytic_bigquery/table"
+	"github.com/pdcgo/common_conf/pdc_common"
 )
 
 func TestEventLog(t *testing.T) {
 	ctx := context.Background()
-	client, _ := analytic_bigquery.NewClient(ctx)
+	config := pdc_common.GetConfig()
+	client, _ := analytic_bigquery.NewClient(config.Credential, ctx)
 
 	opts := []table.Option{
 		table.WithClient(client),

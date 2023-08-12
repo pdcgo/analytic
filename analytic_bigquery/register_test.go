@@ -6,12 +6,14 @@ import (
 
 	"github.com/pdcgo/analytic/analytic_bigquery"
 	table "github.com/pdcgo/analytic/analytic_bigquery/table"
+	"github.com/pdcgo/common_conf/pdc_common"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestRegisterTableTest(t *testing.T) {
 	ctx := context.Background()
-	client, _ := analytic_bigquery.NewClient(ctx)
+	config := pdc_common.GetConfig()
+	client, _ := analytic_bigquery.NewClient(config.Credential, ctx)
 
 	t.Run("test real register table", func(t *testing.T) {
 		t.Skip()
